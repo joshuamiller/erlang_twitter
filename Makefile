@@ -1,5 +1,5 @@
 LIBDIR=`erl -eval 'io:format("~s~n", [code:lib_dir()])' -s init stop -noshell`
-VERSION=0.4.2
+VERSION=0.5
 
 all:
 		mkdir -p ebin/

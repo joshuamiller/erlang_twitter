@@ -1,3 +1,10 @@
+## New in v0.5
+
+There are two backwards-incompatible changes in this version:
+
+1. When Twitter returns an error (or an HTTP error is generated because Twitter can't be reached),  the body of the HTTP response will be returned in a tuple like {error, session\_remotly\_closed}.  When Twitter rejects the OAuth credentials for a user, the tuple will be {oauth\_error, "Body"}.
+
+2. The Direct Message format for XML has changed, so there is now a separate message record, distinct from status, which is returned when accessing one of the Direct Message methods.
 
 ## About
 
@@ -20,6 +27,15 @@ Each API method function has the same function parameters. They are a string rep
 The _status_ and _user_ records as defined in twitter\_client.hrl represent statuses and users as returned by API requests.
 
 Ideally all API method functions are accessed through the gen\_server API exposed by the module. The twitter\_client:call/2 and twitter\_client:call/3 functions are used for this purpose. The API method functions can also be accessed directly if you wish to bypass the twitter\_client gen\_server altogether.
+
+## Using Oauth
+
+To use the oauth functionality in erlang\_twitter, you need the erlang-oauth library available [here](http://github.com/tim/erlang-oauth).  Once you have your application's Consumer keypair (obtained from Twitter) and a Token and a Secret for your users, you can make OAuth requests to Twitter like
+
+    1> inets:start().
+    2> twitter_client:status_user_timeline("http://twitter.com/", Consumer, Token, Secret, []).
+    
+Note: User session management via add\_session is not currently available.
 
 ## Multiple Sessions
 
