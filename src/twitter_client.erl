@@ -904,6 +904,7 @@ oauth_request_url(get, Url, Consumer, Token, Secret, Args) ->
     HTTPResult = oauth:get(Url, Args, Consumer, Token, Secret),
     case HTTPResult of
         {ok, {_Status, _Headers, "Failed to validate oauth signature or token"}} -> {oauth_error, "Failed to validate oauth signature or token"};
+        {ok, {{_HTTP, 401, _StatusText}, _Headers, _Body}} -> {error, "OAuth 401"};
         {ok, {_Status, _Headers, Body}} -> Body;
         _ -> HTTPResult
     end;
@@ -912,6 +913,7 @@ oauth_request_url(post, Url, Consumer, Token, Secret, Args) ->
     HTTPResult = oauth:post(Url, Args, Consumer, Token, Secret),
     case HTTPResult of
         {ok, {_Status, _Headers, "Failed to validate oauth signature or token"}} -> {oauth_error, "Failed to validate oauth signature or token"};
+        {ok, {{_HTTP, 401, _StatusText}, _Headers, _Body}} -> {error, "OAuth 401"};
         {ok, {_Status, _Headers, Body}} -> Body;
         _ -> HTTPResult
     end.
