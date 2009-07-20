@@ -380,7 +380,7 @@ account_verify_credentials(RootUrl, Login, Password, _) ->
     Url = build_url(RootUrl ++ "account/verify_credentials.xml", []),
     HTTPResult = http:request(get, {Url, headers(Login, Password)}, [], []),
     case HTTPResult of
-        {ok, {{_HTTPVersion, 200, _Text}, _Headers, _Body}} -> true;
+        {ok, {{_HTTPVersion, 200, _Text}, _Headers, Body}} -> parse_user(Body);
         {ok, {{_HTTPVersion, 401, _Text}, _Headers, _Body}} -> false;
         _ -> {error}
     end.
@@ -388,7 +388,7 @@ account_verify_credentials(RootUrl, Consumer, Token, Secret, _) ->
     Url = build_url(RootUrl ++ "account/verify_credentials.xml", []),
     HTTPResult = oauth:get(Url, [], Consumer, Token, Secret),
     case HTTPResult of
-        {ok, {{_HTTPVersion, 200, _Text}, _Headers, _Body}} -> true;
+        {ok, {{_HTTPVersion, 200, _Text}, _Headers, Body}} -> parse_user(Body);
         {ok, {{_HTTPVersion, 401, _Text}, _Headers, _Body}} -> false;
         _ -> {error}
     end.
