@@ -881,6 +881,11 @@ build_url(Url, Args) ->
 request_url(get, Url, Login, Pass, _) ->
     HTTPResult = http:request(get, {Url, headers(Login, Pass)}, [{timeout, 6000}], []),
     case HTTPResult of
+        {ok, {{_HTTP, 400, _Status}, _Headers, _Body}} -> {error, rate_limit};
+        {ok, {{_HTTP, 401, _Status}, _Headers, _Body}} -> {error, bad_credentials};
+        {ok, {{_HTTP, 500, _Status}, _Headers, _Body}} -> {error, server_error};
+        {ok, {{_HTTP, 502, _Status}, _Headers, _Body}} -> {error, downtime};
+        {ok, {{_HTTP, 503, _Status}, _Headers, _Body}} -> {error, overloaded};
         {ok, {_Status, _Headers, Body}} -> Body;
         _ -> {error, HTTPResult}
     end;
@@ -895,6 +900,11 @@ request_url(post, Url, Login, Pass, Args) ->
     ),
     HTTPResult = http:request(post, {Url, headers(Login, Pass), "application/x-www-form-urlencoded", Body} , [{timeout, 6000}], []),
     case HTTPResult of
+        {ok, {{_HTTP, 400, _Status}, _Headers, _Body}} -> {error, rate_limit};
+        {ok, {{_HTTP, 401, _Status}, _Headers, _Body}} -> {error, bad_credentials};
+        {ok, {{_HTTP, 500, _Status}, _Headers, _Body}} -> {error, server_error};
+        {ok, {{_HTTP, 502, _Status}, _Headers, _Body}} -> {error, downtime};
+        {ok, {{_HTTP, 503, _Status}, _Headers, _Body}} -> {error, overloaded};
         {ok, {_Status, _Headers, Body}} -> Body;
         _ -> {error, HTTPResult}
     end.
@@ -903,8 +913,11 @@ request_url(post, Url, Login, Pass, Args) ->
 oauth_request_url(get, Url, Consumer, Token, Secret, Args) ->
     HTTPResult = oauth:get(Url, Args, Consumer, Token, Secret),
     case HTTPResult of
-        {ok, {_Status, _Headers, "Failed to validate oauth signature or token"}} -> {oauth_error, "Failed to validate oauth signature or token"};
-        {ok, {{_HTTP, 401, _StatusText}, _Headers, _Body}} -> {error, "OAuth 401"};
+        {ok, {{_HTTP, 400, _Status}, _Headers, _Body}} -> {error, rate_limit};
+        {ok, {{_HTTP, 401, _Status}, _Headers, _Body}} -> {error, bad_credentials};
+        {ok, {{_HTTP, 500, _Status}, _Headers, _Body}} -> {error, server_error};
+        {ok, {{_HTTP, 502, _Status}, _Headers, _Body}} -> {error, downtime};
+        {ok, {{_HTTP, 503, _Status}, _Headers, _Body}} -> {error, overloaded};
         {ok, {_Status, _Headers, Body}} -> Body;
         _ -> HTTPResult
     end;
@@ -912,8 +925,11 @@ oauth_request_url(get, Url, Consumer, Token, Secret, Args) ->
 oauth_request_url(post, Url, Consumer, Token, Secret, Args) ->
     HTTPResult = oauth:post(Url, Args, Consumer, Token, Secret),
     case HTTPResult of
-        {ok, {_Status, _Headers, "Failed to validate oauth signature or token"}} -> {oauth_error, "Failed to validate oauth signature or token"};
-        {ok, {{_HTTP, 401, _StatusText}, _Headers, _Body}} -> {error, "OAuth 401"};
+        {ok, {{_HTTP, 400, _Status}, _Headers, _Body}} -> {error, rate_limit};
+        {ok, {{_HTTP, 401, _Status}, _Headers, _Body}} -> {error, bad_credentials};
+        {ok, {{_HTTP, 500, _Status}, _Headers, _Body}} -> {error, server_error};
+        {ok, {{_HTTP, 502, _Status}, _Headers, _Body}} -> {error, downtime};
+        {ok, {{_HTTP, 503, _Status}, _Headers, _Body}} -> {error, overloaded};
         {ok, {_Status, _Headers, Body}} -> Body;
         _ -> HTTPResult
     end.
